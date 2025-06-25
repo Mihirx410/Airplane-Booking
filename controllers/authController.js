@@ -46,7 +46,7 @@ export const signupUser = async (req, res) => {
   const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
   export const googleLogin = async (req, res) => {
-    const { token } = req.body;
+    const { token, mode } = req.body; // 'login' or 'signup'
   
     try {
       const ticket = await client.verifyIdToken({
@@ -55,19 +55,28 @@ export const signupUser = async (req, res) => {
       });
   
       const payload = ticket.getPayload();
-      const { email, name, sub } = payload;
+      const { email, name } = payload;
   
       if (!email) {
         return res.status(400).json({ message: 'Invalid token payload' });
       }
   
-      // Check if user already exists
-      let user = await User.findOne({ email });
+      const user = await User.findOne({ email });
   
-      // If not, create one (you can store Google ID if needed)
-      if (!user) {
-        user = new User({ email, password: '', name });
-        await user.save();
+      if (mode === 'login') {
+        if (!user) {
+          return res.status(404).json({ message: 'User not found. Please sign up first.' });
+        }
+      } else if (mode === 'signup') {
+        if (user) {
+          return res.status(400).json({ message: 'User already exists. Please log in.' });
+        }
+        const newUser = new User({ email, name, password: '' }); // Store name, password can be empty
+        await newUser.save();
+        return res.status(201).json({
+            message: 'Google signup successful',
+            user: { id: newUser._id, email: newUser.email },
+        });
       }
   
       res.status(200).json({
@@ -75,8 +84,8 @@ export const signupUser = async (req, res) => {
         user: { id: user._id, email: user.email },
       });
     } catch (err) {
-      console.error('Google Login Error:', err);
-      res.status(401).json({ message: 'Invalid Google token' });
+      console.error('Google Auth Error:', err);
+      res.status(401).json({ message: 'Invalid Google token or server error' });
     }
   };
 
