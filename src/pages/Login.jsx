@@ -35,9 +35,11 @@ function Login() {
       const res = await axios.post(`http://localhost:5000/api${endpoint}`, { email, password });
       if (isLogin) {
         setMessage({ text: 'Login Success!', type: 'success' });
-        // TODO: Redirect or set auth state
+        if (res.data.token) localStorage.setItem('token', res.data.token);
+        navigate('/');
       } else {
         setMessage({ text: 'Signup Success! You can now log in.', type: 'success' });
+        if (res.data.token) localStorage.setItem('token', res.data.token);
         navigate('/login');
       }
     } catch (err) {
@@ -76,7 +78,8 @@ function Login() {
       .then((data) => {
         console.log('✅ Server Response:', data);
         setMessage({ text: data.message || 'Google login successful!', type: 'success' });
-        // TODO: Redirect or set auth state
+        if (data.token) localStorage.setItem('token', data.token);
+        navigate('/');
       })
       .catch((err) => {
         console.error('❌ Error:', err);
