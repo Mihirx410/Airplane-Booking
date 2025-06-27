@@ -7,6 +7,7 @@ import connectDB from './config/db.js'
 import session from 'express-session';
 import passport from 'passport';
 import './config/passport.js';
+import bookingRoutes from './routes/bookingRoutes.js'
 
 
 dotenv.config()
@@ -28,6 +29,7 @@ app.use(express.json())
 
 // Routes
 app.use('/api/auth', authRoutes)
+app.use('/api/bookings', bookingRoutes)
 
 // Start server
 const PORT = process.env.PORT || 5000
