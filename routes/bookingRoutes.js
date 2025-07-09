@@ -5,7 +5,7 @@ import { authenticateJWT } from '../middleware/auth.js';
 const router = express.Router();
 
 router.post('/', authenticateJWT, createBooking);
-router.get('/my', authenticateJWT, getMyBookings);
+router.get('/', authenticateJWT, getMyBookings);
 router.put('/:id', authenticateJWT, updateBooking);
 router.delete('/:id', authenticateJWT, deleteBooking);
 
