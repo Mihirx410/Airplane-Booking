@@ -27,7 +27,7 @@ export default function LandingPage() {
       return;
     }
     try {
-      const res = await axios.get('http://localhost:5000/api/bookings/my', {
+      const res = await axios.get('http://localhost:5000/api/bookings', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBookings(res.data.bookings || []);
